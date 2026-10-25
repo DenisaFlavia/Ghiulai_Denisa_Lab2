@@ -1,3 +1,4 @@
+
 @page
 @model Ghiulai_Denisa_Lab2.Pages.BookPages.DetailsModel
 
@@ -10,27 +11,76 @@
 <div>
     <h4>Book</h4>
     <hr />
+
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book.Title)
+        <dt class="col-sm-2">
+            Book Title
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Book.Title)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book.Author)
+
+        <dt class="col-sm-2">
+            Author
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Book.Author)
+        <dd class="col-sm-10">
+            @if (Model.Book.AuthorNavigation != null)
+            {
+                @($"{Model.Book.AuthorNavigation.FirstName} {Model.Book.AuthorNavigation.LastName}")
+            }
+            else
+            {
+                <text>No author assigned</text>
+            }
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book.Price)
+
+        <dt class="col-sm-2">
+            Price
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Book.Price)
+        </dd>
+
+        <dt class="col-sm-2">
+            Publishing Date
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Book.PublishingDate)
+        </dd>
+
+        <dt class="col-sm-2">
+            Publisher
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Book.Publisher?.PublisherName
+        </dd>
+
+        <dt class="col-sm-2">
+            Categories
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Book.BookCategories != null &&
+                 Model.Book.BookCategories.Any())
+            {
+                foreach (var category in Model.Book.BookCategories)
+                {
+                    if (category.Category != null)
+                    {
+                        <div>
+                            @category.Category.ID
+                            @category.Category.CategoryName
+                        </div>
+                    }
+                }
+            }
+            else
+            {
+                <text>No categories assigned</text>
+            }
         </dd>
     </dl>
 </div>
+
 <div>
     <a asp-page="./Edit" asp-route-id="@Model.Book.ID">Edit</a> |
     <a asp-page="./Index">Back to List</a>

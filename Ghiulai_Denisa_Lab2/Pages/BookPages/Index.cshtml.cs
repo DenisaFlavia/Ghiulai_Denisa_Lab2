@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,47 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    public IList<Book> Book { get; set; } = default!;
+    public IList<Book> Book { get; set; } = new List<Book>();
 
-    public async Task OnGetAsync()
+    public BookData BookD { get; set; } = new BookData();
+
+    public int BookID { get; set; }
+
+    public int CategoryID { get; set; }
+
+    public async Task OnGetAsync(int? id, int? categoryID)
     {
-        Book = await _context.Book.ToListAsync();
+        BookD = new BookData();
+
+        BookD.Books = await _context.Book
+            .Include(b => b.Publisher)
+            .Include(b => b.AuthorNavigation)
+            .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
+            .AsNoTracking()
+            .OrderBy(b => b.Title)
+            .ToListAsync();
+
+        Book = BookD.Books.ToList();
+
+        if (id != null)
+        {
+            BookID = id.Value;
+
+            var book = BookD.Books
+                .FirstOrDefault(b => b.ID == id.Value);
+
+            if (book != null)
+            {
+                BookD.Categories = book.BookCategories?
+                    .Select(bc => bc.Category)
+                    .ToList() ?? new List<Category>();
+            }
+        }
+
+        if (categoryID != null)
+        {
+            CategoryID = categoryID.Value;
+        }
     }
 }

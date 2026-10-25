@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ namespace Ghiulai_Denisa_Lab2.Pages.BookPages;
 public class DetailsModel : PageModel
 {
     private readonly Ghiulai_Denisa_Lab2Context _context;
+
     public DetailsModel(Ghiulai_Denisa_Lab2Context context)
     {
         _context = context;
@@ -22,15 +24,19 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
-        var book = await _context.Book.FirstOrDefaultAsync(m => m.ID == id);
+        var book = await _context.Book
+            .Include(b => b.Publisher)
+            .Include(b => b.AuthorNavigation)
+            .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
+            .FirstOrDefaultAsync(b => b.ID == id);
+
         if (book is null)
         {
             return NotFound();
         }
-        else
-        {
-            Book = book;
-        }
+
+        Book = book;
 
         return Page();
     }
